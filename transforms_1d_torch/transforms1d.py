@@ -36,7 +36,7 @@ class Multiply:
         x: channels x serie_len (C, S)
         """
         C, S = x.size()
-        scale = torch.rand((C, 1)) * self.max_value + self.min_value
+        scale = (self.max_value - self.min_value) * torch.rand(1) + self.min_value
         x = x * scale
         return x
 

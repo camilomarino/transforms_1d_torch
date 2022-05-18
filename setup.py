@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 setup(
     name="transforms_1d_torch",
     packages=find_packages(),
-    version="0.1.0",
+    version="0.1.1",
     description="",
     author="Camilo Mariño",
     license="MIT",
