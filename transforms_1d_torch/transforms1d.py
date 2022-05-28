@@ -57,9 +57,10 @@ class RandomCrop:
         if float(torch.rand(1)) < self.p:
             C, S = x.size()
             samples_to_crop = int(self.crop_percentage * S)
-            start_idx = random.randint(0, S - samples_to_crop - 1)
+            start_idx = random.randint(0, S - 1)
             end_idx = start_idx + samples_to_crop
             x = x.clone()
+            x[:, 0 : end_idx - S] = 0
             x[:, start_idx:end_idx] = 0
         return x
 
