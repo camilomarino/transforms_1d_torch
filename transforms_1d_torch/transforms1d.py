@@ -121,6 +121,37 @@ class UnScale:
         return x
 
 
+class GaussianNoise:
+    def __init__(self, p: float = 0.5, mu: float = 0.0, std: float = 0.1):
+        """
+        Add noise to the time series according to the mean and standard deviation.
+                If `mu` and/or `std` are scalars, all channels are
+                    scaled by the same value.
+                If they are not scalars, it must be a vector of the same
+                    size as the number of channels that the series to
+                    transform has.
+        """
+        self.p = p
+        mu = torch.as_tensor(mu)
+        std = torch.as_tensor(std)
+
+        _check_tensor_shape(mu, "mu")
+        _check_tensor_shape(std, "std")
+
+        self.mu = _convert_tensor_shape(mu)
+        self.std = _convert_tensor_shape(std)
+
+    def __call__(self, x: torch.Tensor):
+        """
+        x: channels x serie_len (C, S)
+        """
+        if float(torch.rand(1)) < self.p:
+            C, S = x.size()
+            noise = torch.randn(C, S) * self.std + self.mu
+            x = x + noise
+        return x
+
+
 def _check_tensor_shape(x: torch.Tensor, name: Optional[str] = None) -> None:
     """
     Check that `x` is a scalar or a one-dimensional tensor.
