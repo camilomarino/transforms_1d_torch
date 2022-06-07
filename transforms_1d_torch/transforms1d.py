@@ -6,28 +6,33 @@ from torchvision.transforms import Compose
 
 
 class CircularShift1d:
-    def __init__(self, max_shift: Optional[int] = None):
+    def __init__(self, p: float = 0.5, max_shift: Optional[int] = None):
         """
         Apply a shift to all channels.
         """
+        self.p = p
         self.max_shift = max_shift
 
     def __call__(self, x: torch.Tensor):
         """
         x: channels x serie_len (C, S)
         """
-        C, S = x.size()
-        max_shift = self.max_shift if self.max_shift is not None else S
-        shift = random.randint(0, max_shift + 1)
-        x = torch.roll(x, shift, dims=1)
+        if float(torch.rand(1)) < self.p:
+            C, S = x.size()
+            max_shift = self.max_shift if self.max_shift is not None else S
+            shift = random.randint(0, max_shift + 1)
+            x = torch.roll(x, shift, dims=1)
         return x
 
 
 class Multiply:
-    def __init__(self, min_value: float = 0.85, max_value: float = 1.15):
+    def __init__(
+        self, p: float = 0.5, min_value: float = 0.85, max_value: float = 1.15
+    ):
         """
         Multiplies all channels by a constant.
         """
+        self.p = p
         self.min_value = min_value
         self.max_value = max_value
 
@@ -35,9 +40,10 @@ class Multiply:
         """
         x: channels x serie_len (C, S)
         """
-        C, S = x.size()
-        scale = (self.max_value - self.min_value) * torch.rand(1) + self.min_value
-        x = x * scale
+        if float(torch.rand(1)) < self.p:
+            C, S = x.size()
+            scale = (self.max_value - self.min_value) * torch.rand(1) + self.min_value
+            x = x * scale
         return x
 
 
