@@ -65,6 +65,43 @@ class RandomCrop:
         return x
 
 
+class RandomDrop:
+    def __init__(
+        self,
+        p: float = 1.0,
+        drop_percentage: float = 0.15,
+        mu: float = 0.0,
+        std: float = 1.0,
+    ):
+        """
+        Drop a part of the time series for all channels.
+            crop_percentage must be <1
+        """
+        self.p = p
+        self.drop_percentage = drop_percentage
+
+        mu = torch.as_tensor(mu)
+        std = torch.as_tensor(std)
+
+        _check_tensor_shape(mu, "mu")
+        _check_tensor_shape(std, "std")
+
+        self.mu = _convert_tensor_shape(mu)
+        self.std = _convert_tensor_shape(std)
+
+    def __call__(self, x: torch.Tensor):
+        """
+        x: channels x serie_len (C, S)
+        """
+        if float(torch.rand(1)) < self.p:
+            C, S = x.size()
+            samples_to_drop = int(self.drop_percentage * S)
+            x = x.clone()
+            idx_to_drop = torch.randint(low=0, high=S, size=(samples_to_drop,))
+            x[:, idx_to_drop] = torch.randn(C, samples_to_drop) * self.std + self.mu
+        return x
+
+
 class Scale:
     def __init__(self, mu: float, std: float):
         """
